@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>मल्टी-लेवल रेफरल सिस्टम</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Level 1 (You) -->
+        <div id="level1-page" class="page active">
+            <h1>अपने दोस्त को कूपन भेजें</h1>
+            <button onclick="shareCoupon(1)">WhatsApp पर शेयर करें</button>
+            <div id="your-coupon" class="coupon" style="display:none;">
+                <p>आपका कूपन:</p>
+                <h3>SHOP30</h3>
+            </div>
+        </div>
+
+        <!-- Level 2 (Friend) -->
+        <div id="level2-page" class="page">
+            <h1>आपके दोस्त ने आपको कूपन भेजा है!</h1>
+            <button onclick="shareCoupon(2)">अपने दोस्त को आगे भेजें</button>
+            <div id="friend-coupon" class="coupon" style="display:none;">
+                <p>आपका कूपन:</p>
+                <h3>FRIEND20</h3>
+            </div>
+        </div>
+
+        <!-- Level 3 (Friend's Friend) -->
+        <div id="level3-page" class="page">
+            <h1>आपको कूपन मिला है!</h1>
+            <div id="friend2-coupon" class="coupon">
+                <p>आपका कूपन:</p>
+                <h3>NEW15</h3>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

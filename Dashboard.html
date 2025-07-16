@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Referral System Dashboard for Sharma Electronics">
+    <meta name="theme-color" content="#4f46e5">
+    <title>Sharma Electronics - Referral Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --light: #f9fafb;
+            --dark: #1f2937;
+            --gray: #6b7280;
+            --light-gray: #e5e7eb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Noto Sans Devanagari', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: #f3f4f6;
+            color: var(--dark);
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .shop-name {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .shop-name h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* Date Filter */
+        .date-filter {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--light-gray);
+            background: white;
+            color: var(--gray);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+        
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .card-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-subtext {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Charts */
+        .chart-container {
+            margin-top: 1.5rem;
+            height: 250px;
+        }
+        
+        /* Top Referrers */
+        .top-referrers {
+            grid-column: span 2;
+        }
+        
+        .referrer-list {
+            margin-top: 1rem;
+        }
+        
+        .referrer-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .referrer-item:last-child {
+            border-bottom: none;
+        }
+        
+        .referrer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .referrer-details {
+            flex: 1;
+        }
+        
+        .referrer-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .referrer-stats {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Export Button */
+        .export-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 1rem;
+        }
+        
+        .export-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--light-gray);
+            margin-top: 2rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-referrers {
+                grid-column: span 1;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+        
+        /* PWA Install Prompt */
+        .pwa-install {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1000;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .pwa-install button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="shop-name">
+                    <div class="logo">SE</div>
+                    <h1>Sharma Electronics</h1>
+                </div>
+                <div class="pwa-install" id="installContainer" style="display:none;">
+                    <p>इस ऐप को इंस्टॉल करें</p>
+                    <button id="installButton">Install</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <!-- Date Filter -->
+        <div class="date-filter">
+            <button class="filter-btn active">आज</button>
+            <button class="filter-btn">कल</button>
+            <button class="filter-btn">पिछले 7 दिन</button>
+            <button class="filter-btn">महीना</button>
+        </div>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Total Referrals -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon" style="background-color: #e0e7ff; color: var(--primary);">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                        <span>कुल Referrals</span>
+                    </div>
+                </div>
+                <div class="card-value">48</div>
+                <div class="card-subtext">पिछले 7 दिनों से 12% की वृद्धि</div>
+                <div class="chart-container">
+                    <canvas id="referralsChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- New Customers -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon" style="background-color: #d1fae5; color: var(--secondary);">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span>नए ग्राहक</span>
+                    </div>
+                </div>
+                <div class="card-value">32</div>
+                <div class="card-subtext">पिछले महीने से 18% की वृद्धि</div>
+            </div>
+            
+            <!-- QR Scans -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon" style="background-color: #ffedd5; color: #f97316;">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <span>QR Scans</span>
+                    </div>
+                </div>
+                <div class="card-value">126</div>
+                <div class="card-subtext">कल से 8% की वृद्धि</div>
+            </div>
+            
+            <!-- Coupons Used -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon" style="background-color: #fce7f3; color: #db2777;">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <span>कूपन यूज़ हुए</span>
+                    </div>
+                </div>
+                <div class="card-value">24</div>
+                <div class="card-subtext">कुल उपलब्ध कूपन का 40%</div>
+            </div>
+            
+            <!-- Discount Given -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon" style="background-color: #dbeafe; color: #3b82f6;">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <span>छूट दी गई</span>
+                    </div>
+                </div>
+                <div class="card-value">₹5,820</div>
+                <div class="card-subtext">औसत छूट ₹243 प्रति कूपन</div>
+            </div>
+            
+            <!-- Top Referrers -->
+            <div class="card top-referrers">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon" style="background-color: #ede9fe; color: #8b5cf6;">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <span>सबसे ज्यादा भेजने वाले ग्राहक</span>
+                    </div>
+                </div>
+                <div class="referrer-list">
+                    <div class="referrer-item">
+                        <div class="referrer-avatar">RK</div>
+                        <div class="referrer-details">
+                            <div class="referrer-name">राजेश कुमार</div>
+                            <div class="referrer-stats">
+                                <span>+91 98765 43210</span>
+                                <span>12 Referrals</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="referrer-item">
+                        <div class="referrer-avatar">SP</div>
+                        <div class="referrer-details">
+                            <div class="referrer-name">सुनीता पाटिल</div>
+                            <div class="referrer-stats">
+                                <span>+91 87654 32109</span>
+                                <span>9 Referrals</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="referrer-item">
+                        <div class="referrer-avatar">AM</div>
+                        <div class="referrer-details">
+                            <div class="referrer-name">अमित मिश्रा</div>
+                            <div class="referrer-stats">
+                                <span>+91 76543 21098</span>
+                                <span>7 Referrals</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="referrer-item">
+                        <div class="referrer-avatar">PS</div>
+                        <div class="referrer-details">
+                            <div class="referrer-name">प्रिया शर्मा</div>
+                            <div class="referrer-stats">
+                                <span>+91 65432 10987</span>
+                                <span>6 Referrals</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="referrer-item">
+                        <div class="referrer-avatar">VS</div>
+                        <div class="referrer-details">
+                            <div class="referrer-name">विकास सिंह</div>
+                            <div class="referrer-stats">
+                                <span>+91 94321 09876</span>
+                                <span>5 Referrals</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Export Button -->
+        <button class="export-btn">
+            <i class="fas fa-file-excel"></i>
+            Excel में export
+        </button>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>© 2023 Sharma Electronics. सभी अधिकार सुरक्षित।</p>
+            <p>Referral Dashboard v1.0</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Chart initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referrals Chart
+            const referralsCtx = document.getElementById('referralsChart').getContext('2d');
+            const referralsChart = new Chart(referralsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '2', '3', '4', '5', '6', '7'],
+                    datasets: [{
+                        label: 'Referrals',
+                        data: [5, 7, 6, 8, 4, 9, 12],
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Date filter functionality
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // In a real app, this would fetch new data based on the filter
+                });
+            });
+            
+            // PWA Installation
+            let deferredPrompt;
+            const installContainer = document.getElementById('installContainer');
+            const installButton = document.getElementById('installButton');
+            
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installContainer.style.display = 'flex';
+            });
+            
+            installButton.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installContainer.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                }
+            });
+            
+            window.addEventListener('appinstalled', () => {
+                installContainer.style.display = 'none';
+                deferredPrompt = null;
+            });
+        });
+        
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registered: ', registration.scope);
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+    
+    <!-- Manifest for PWA -->
+    <script type="application/manifest+json">
+        {
+            "name": "Sharma Electronics Dashboard",
+            "short_name": "SE Dashboard",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#f3f4f6",
+            "theme_color": "#4f46e5",
+            "description": "Referral system dashboard for Sharma Electronics",
+            "icons": [
+                {
+                    "src": "icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "icon-512.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        }
+    </script>
+</body>
+</html>
