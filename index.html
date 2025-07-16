@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6a11cb">
+    <meta name="description" content="अपने दोस्तों को भेजें और छूट पाएं">
+    <title>रेफरल कूपन सिस्टम</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #fbfcfc 0%, #f4f5f8 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo i {
+            font-size: 40px;
+            color: #2575fc;
+        }
+        
+        .page {
+            padding: 30px;
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .qr-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .qr-placeholder {
+            width: 100%;
+            height: 100%;
+            background: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            color: #3498db;
+        }
+        
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .otp-input {
+            width: 55px;
+            height: 55px;
+            text-align: center;
+            font-size: 24px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .otp-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        
+        button {
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(37, 117, 252, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .whatsapp-btn {
+            background: linear-gradient(to right, #25D366, #128C7E);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .coupon {
+            margin: 30px 0;
+            padding: 25px;
+            border: 2px dotted #2ecc71;
+            border-radius: 15px;
+            background: #f8f9fa;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .coupon:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: repeating-linear-gradient(
+                45deg,
+                #27ae60,
+                #27ae60 10px,
+                #2ecc71 10px,
+                #2ecc71 20px
+            );
+        }
+        
+        .coupon h3 {
+            color: #27ae60;
+            font-size: 32px;
+            margin: 15px 0;
+            letter-spacing: 3px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f0f7ff;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .instructions {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f0f7ff;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .instructions h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .referral-link {
+            display: flex;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        
+        .referral-link input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .referral-link button {
+            width: auto;
+            padding: 12px 20px;
+            margin: 0;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .success-animation {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .success-animation i {
+            font-size: 80px;
+            color: #2ecc71;
+            animation: bounce 1s infinite alternate;
+        }
+        
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+        
+        .user-info {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .qr-code {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .otp-input {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+            
+            .coupon h3 {
+                font-size: 28px;
+            }
+        }
+        
+        /* PWA Install Prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 50px;
+            padding: 12px 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { bottom: -100px; }
+            to { bottom: 20px; }
+        }
+        
+        .install-prompt button {
+            width: auto;
+            padding: 8px 20px;
+            margin: 0;
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            border-radius: 30px;
+        }
+        
+        .install-prompt button.cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .offline-indicator {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #e74c3c;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-weight: 500;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .offline .offline-indicator {
+            display: block;
+        }
+        
+        .friend-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        /* कूपन इमेज के लिए स्टाइल */
+        .coupon-image-container {
+            display: none;
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+        }
+        
+        .coupon-image {
+            width: 400px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9f7ef);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 3px dashed #2ecc71;
+        }
+        
+        .coupon-image h3 {
+            font-size: 36px;
+            color: #27ae60;
+            margin: 15px 0;
+            letter-spacing: 4px;
+        }
+        
+        .coupon-image p {
+            color: #555;
+            margin: 8px 0;
+            font-size: 18px;
+        }
+        
+        .coupon-image .validity {
+            font-weight: bold;
+            color: #e74c3c;
+            margin-top: 15px;
+        }
+        
+        /* New styles for success message */
+        .share-success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+        
+        .coupon-unlock-btn {
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            margin-top: 15px;
+            display: block;
+        }
+        
+        /* Landing page styles */
+        .landing-page {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .landing-icon {
+            font-size: 80px;
+            color: #6a11cb;
+            margin: 20px 0;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .landing-message {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .landing-message h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .referral-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .referral-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .referral-info p {
+            font-weight: 500;
+        }
+        
+        .hidden-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 20px;
+        }
+        
+        .loader-text {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #6a11cb;
+            font-weight: 500;
+        }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(106, 17, 203, 0.2);
+            border-top-color: #6a11cb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-qrcode"></i>
+            </div>
+            <h2>अपने दोस्तों के साथ शेयर करें और इंस्टेंट डिस्काउंट पाएं।</h2>
+        </div>
+        
+        <!-- QR Scan Page -->
+        <div id="scan-page" class="page">
+            <h2>दुकान पर QR स्कैन करें</h2>
+            
+            <div class="qr-container">
+                <div class="qr-code" id="real-qr-code"></div>
+                <p>या डेमो के लिए बटन पर क्लिक करें</p>
+            </div>
+            
+            <button onclick="showOTPPage()">
+                <i class="fas fa-camera"></i> QR स्कैन करें (डेमो)
+            </button>
+        </div>
+        
+        <!-- OTP Verification Page -->
+        <div id="otp-page" class="page">
+            <h2>OTP वेरिफिकेशन</h2>
+            <p style="text-align: center;">आपके नंबर ******45 पर OTP भेजा गया</p>
+            
+            <div class="otp-container">
+                <input type="text" maxlength="1" class="otp-input" id="otp1">
+                <input type="text" maxlength="1" class="otp-input" id="otp2">
+                <input type="text" maxlength="1" class="otp-input" id="otp3">
+                <input type="text" maxlength="1" class="otp-input" id="otp4">
+            </div>
+            
+            <p class="error" id="otp-error"></p>
+            
+            <button onclick="verifyOTP()">वेरिफाई करें</button>
+        </div>
+        
+        <!-- Referral Page -->
+        <div id="referral-page" class="page">
+            <h2>हमारी दुकान को शेयर करें और 5% एक्स्ट्रा डिस्काउंट पाएं!</h2>
+            
+            <div class="referral-link">
+                <input type="text" id="referral-url" value="https://example.com/refer?code=SHOP30" readonly>
+                <button onclick="copyReferralLink()">
+                    <i class="fas fa-copy"></i> कॉपी करें
+                </button>
+            </div>
+            
+            <button id="whatsapp-share-btn" class="whatsapp-btn" onclick="shareOnWhatsApp()">
+                <i class="fab fa-whatsapp"></i> WhatsApp पर शेयर करें
+            </button>
+            
+            <div class="share-success" id="share-success">
+                <i class="fas fa-check-circle"></i> सफलतापूर्वक शेयर किया गया! 
+                <p>अब आप अपना कूपन अनलॉक कर सकते हैं</p>
+                <button class="coupon-unlock-btn" onclick="showCouponPage()">
+                    <i class="fas fa-gift"></i> मेरा कूपन अनलॉक करें
+                </button>
+            </div>
+            
+            <p id="instruction-text" style="text-align: center; margin-top: 20px; font-style: italic;">
+                जैसे ही आप शेयर करेंगे, आपका कूपन अनलॉक हो जाएगा
+            </p>
+        </div>
+        
+        <!-- Coupon Page -->
+        <div id="coupon-page" class="page">
+            <div class="success-animation">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h2>बधाई हो! आपका कूपन अनलॉक हो गया</h2>
+            
+            <div class="coupon">
+                <h3 id="coupon-code">Rs. 50/-</h3>
+                <p>कूपन कोड का उपयोग करने के लिए कैशियर को दिखाएं</p>
+            </div>
+            
+            <div class="instructions">
+                <h4>कूपन का उपयोग कैसे करें:</h4>
+                <ol>
+                    <li>अपनी खरीदारी पूरी करें</li>
+                    <li>बिलिंग काउंटर पर जाएं</li>
+                    <li>कैशियर को यह कूपन दिखाएं</li>
+                    <li>अपनी छूट का आनंद लें!</li>
+                </ol>
+            </div>
+            
+            <button onclick="showScanPage()">
+                <i class="fas fa-home"></i> होम पेज पर वापस जाएं
+            </button>
+        </div>
+        
+        <!-- Landing Page for Referred Users -->
+        <div id="landing-page" class="page landing-page">
+            <div class="landing-icon">
+                <i class="fas fa-lock-open"></i>
+            </div>
+            
+            <h2>अपना कूपन अनलॉक करें!</h2>
+            
+            <div class="landing-message">
+                <h3>अपना कूपन प्राप्त करने के लिए, कृपया इस ऑफर को WhatsApp पर शेयर करें</h3>
+                <p>शेयर करने के बाद, आप अपना विशेष डिस्काउंट कूपन अनलॉक कर पाएंगे</p>
+            </div>
+            
+            <div class="referral-info">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Referrer">
+                <p>आपका दोस्त <strong>राजेश शर्मा</strong> ने आपको इस ऑफर के लिए आमंत्रित किया है</p>
+            </div>
+            
+            <button id="landing-whatsapp-btn" class="whatsapp-btn" onclick="shareLandingOnWhatsApp()">
+                <i class="fab fa-whatsapp"></i> WhatsApp पर शेयर करें और कूपन अनलॉक करें
+            </button>
+            
+            <div class="share-success" id="landing-share-success">
+                <i class="fas fa-check-circle"></i> सफलतापूर्वक शेयर किया गया! 
+                <p>अब आप अपना कूपन अनलॉक कर सकते हैं</p>
+                <button class="coupon-unlock-btn" onclick="showCouponPage()">
+                    <i class="fas fa-gift"></i> मेरा कूपन अनलॉक करें
+                </button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 रेफरल कूपन सिस्टम | सभी अधिकार सुरक्षित</p>
+        </div>
+        
+        <!-- Hidden loader for coupon unlock -->
+        <div class="hidden-loader" id="hidden-loader">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">कूपन अनलॉक हो रहा है...</div>
+        </div>
+    </div>
+
+    <!-- PWA Install Prompt -->
+    <div id="installPrompt" class="install-prompt" style="display: none;">
+        <p>इस ऐप को अपने होम स्क्रीन पर इंस्टॉल करें</p>
+        <button id="installBtn">इंस्टॉल करें</button>
+        <button class="cancel" id="cancelInstall">बाद में</button>
+    </div>
+    
+    <!-- Offline Indicator -->
+    <div class="offline-indicator">
+        <i class="fas fa-wifi"></i> आप ऑफलाइन हैं। कनेक्शन बहाल होने पर काम करना जारी रखेंगे।
+    </div>
+    
+    <!-- कूपन इमेज के लिए हिडन कंटेनर -->
+    <div class="coupon-image-container">
+        <div class="coupon-image" id="coupon-to-share">
+            <h3>SHOP30</h3>
+            <p>इस कूपन को साथ लाओ और पाओ 5% का एक्स्ट्रा डिस्काउंट!</p>
+            <p>अगली खरीद पर लागू होगा</p>
+            <p class="validity">वैध: 3 दिनों तक</p>
+            <p>www.example.com</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we came from a referral link
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('ref')) {
+                // Show landing page for referred users
+                showPage('landing-page');
+                
+                // For referred users, show Rs. 30 coupon
+                localStorage.setItem('couponValue', 'Rs. 30/-');
+            } else {
+                // For direct users, show Rs. 50 coupon
+                localStorage.setItem('couponValue', 'Rs. 50/-');
+                
+                // Show scan page by default
+                showPage('scan-page');
+            }
+            
+            // Generate QR code
+            generateQRCode();
+            
+            // Initialize PWA features
+            initPWA();
+        });
+        
+        // Generate QR code function using toDataURL
+        function generateQRCode() {
+            const qrElement = document.getElementById('real-qr-code');
+            // Clear any existing content
+            qrElement.innerHTML = '';
+            
+            // Generate QR code as image
+            QRCode.toDataURL("https://example.com/referral-system", {
+                width: 180,
+                margin: 1,
+                color: {
+                    dark: "#000000",
+                    light: "#ffffff"
+                }
+            }, function (err, url) {
+                if (err) {
+                    console.error(err);
+                    // Fallback to table method
+                    new QRCode(qrElement, {
+                        text: "https://example.com/referral-system",
+                        width: 180,
+                        height: 180,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    return;
+                }
+                
+                // Create image element
+                const img = document.createElement('img');
+                img.src = url;
+                img.width = 180;
+                img.height = 180;
+                img.alt = "Scan this QR code";
+                qrElement.appendChild(img);
+            });
+        }
+        
+        // पेज नेविगेशन
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            // If showing coupon page, set the coupon value
+            if (pageId === 'coupon-page') {
+                const couponValue = localStorage.getItem('couponValue') || 'Rs. 50/-';
+                document.getElementById('coupon-code').textContent = couponValue;
+            }
+        }
+        
+        function showScanPage() {
+            showPage('scan-page');
+        }
+        
+        function showOTPPage() {
+            showPage('otp-page');
+            document.getElementById('otp1').focus();
+        }
+        
+        function showCouponPage() {
+            showPage('coupon-page');
+        }
+        
+        // OTP वेरिफिकेशन
+        function verifyOTP() {
+            const otp1 = document.getElementById('otp1').value;
+            const otp2 = document.getElementById('otp2').value;
+            const otp3 = document.getElementById('otp3').value;
+            const otp4 = document.getElementById('otp4').value;
+            const enteredOTP = otp1 + otp2 + otp3 + otp4;
+            
+            if(enteredOTP === '1234') {
+                showPage('referral-page');
+            } else {
+                document.getElementById('otp-error').textContent = 'गलत OTP! डेमो के लिए 1234 डालें';
+            }
+        }
+        
+        // OTP ऑटो फोकस
+        document.querySelectorAll('.otp-input').forEach((input, index, inputs) => {
+            input.addEventListener('input', () => {
+                if(input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if(e.key === 'Backspace' && input.value.length === 0 && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+        
+        // लिंक कॉपी करना
+        function copyReferralLink() {
+            const copyText = document.getElementById("referral-url");
+            copyText.select();
+            document.execCommand("copy");
+            
+            alert("लिंक कॉपी हो गया! अब आप इसे WhatsApp पर शेयर कर सकते हैं");
+        }
+        
+        // WhatsApp शेयर with image (for original user)
+        function shareOnWhatsApp() {
+            // Create coupon image
+            const couponElement = document.getElementById('coupon-to-share');
+            
+            // Show loading state
+            const whatsappBtn = document.getElementById('whatsapp-share-btn');
+            whatsappBtn.disabled = true;
+            whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> शेयर हो रहा है...';
+            
+            html2canvas(couponElement).then(canvas => {
+                // Convert canvas to image
+                const couponImage = canvas.toDataURL('image/png');
+                
+                // Create a temporary link for sharing
+                const tempLink = document.createElement('a');
+                tempLink.href = couponImage;
+                tempLink.download = 'coupon.png';
+                document.body.appendChild(tempLink);
+                
+                // Create share message with image
+                const message = "इस कूपन को साथ लाओ और पाओ 5% का एक्स्ट्रा डिस्काउंट!\n\n" +
+                               "कूपन कोड: SHOP5%\n" +
+                               "लिंक: https://example.com/refer?code=SHOP30";
+                
+                // For mobile devices
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    // Use WhatsApp deep link for mobile
+                    window.open(`whatsapp://send?text=${encodeURIComponent(message)}`);
+                } else {
+                    // For desktop
+                    window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`);
+                }
+                
+                // Hide WhatsApp share button and instruction text
+                document.getElementById('instruction-text').style.display = 'none';
+                
+                // Show success message
+                document.getElementById('share-success').style.display = 'block';
+                
+                // Reset button state
+                whatsappBtn.disabled = false;
+                whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> WhatsApp पर शेयर करें';
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(tempLink);
+                }, 1000);
+            });
+        }
+        
+        // WhatsApp share for landing page users
+        function shareLandingOnWhatsApp() {
+            // Show loading state
+            const whatsappBtn = document.getElementById('landing-whatsapp-btn');
+            whatsappBtn.disabled = true;
+            whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> शेयर हो रहा है...';
+            
+            // Create share message
+            const message = "इस कूपन को साथ लाओ और पाओ 5% का एक्स्ट्रा डिस्काउंट!\n\n" +
+                           "कूपन कोड: SHOP5%\n" +
+                           "लिंक: https://example.com/refer?code=SHOP30";
+            
+            // For mobile devices
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                // Use WhatsApp deep link for mobile
+                window.open(`whatsapp://send?text=${encodeURIComponent(message)}`);
+            } else {
+                // For desktop
+                window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`);
+            }
+            
+            // Show hidden loader
+            const hiddenLoader = document.getElementById('hidden-loader');
+            hiddenLoader.style.display = 'flex';
+            
+            // After 3 seconds, show success
+            setTimeout(() => {
+                hiddenLoader.style.display = 'none';
+                document.getElementById('landing-share-success').style.display = 'block';
+                whatsappBtn.disabled = false;
+                whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> WhatsApp पर शेयर करें और कूपन अनलॉक करें';
+            }, 3000);
+        }
+        
+        // =============================
+        // PWA Functionality
+        // =============================
+        
+        function initPWA() {
+            // Check if browser supports PWAs
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+                // Register service worker
+                navigator.serviceWorker.register('service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                    
+                    // Check if app is already installed
+                    if (!window.matchMedia('(display-mode: standalone)').matches) {
+                        // Show install prompt after delay
+                        setTimeout(() => {
+                            document.getElementById('installPrompt').style.display = 'flex';
+                        }, 5000);
+                    }
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+                
+                // Listen for beforeinstallprompt event
+                let deferredPrompt;
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    // Prevent the mini-infobar from appearing on mobile
+                    e.preventDefault();
+                    // Stash the event so it can be triggered later
+                    deferredPrompt = e;
+                    
+                    // Show our custom install prompt
+                    document.getElementById('installPrompt').style.display = 'flex';
+                });
+                
+                // Install button handler
+                document.getElementById('installBtn').addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        // Show the install prompt
+                        deferredPrompt.prompt();
+                        // Wait for the user to respond to the prompt
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        // Hide our custom install prompt
+                        document.getElementById('installPrompt').style.display = 'none';
+                        // Clear the deferredPrompt variable
+                        deferredPrompt = null;
+                    }
+                });
+                
+                // Cancel button handler
+                document.getElementById('cancelInstall').addEventListener('click', () => {
+                    document.getElementById('installPrompt').style.display = 'none';
+                });
+                
+                // Track installation state
+                window.addEventListener('appinstalled', () => {
+                    console.log('App was successfully installed');
+                    document.getElementById('installPrompt').style.display = 'none';
+                });
+            }
+            
+            // Offline detection
+            window.addEventListener('online', () => {
+                document.documentElement.classList.remove('offline');
+                console.log('You are now online!');
+            });
+            
+            window.addEventListener('offline', () => {
+                document.documentElement.classList.add('offline');
+                console.log('You are now offline!');
+            });
+            
+            // Check initial online status
+            if (!navigator.onLine) {
+                document.documentElement.classList.add('offline');
+            }
+            
+            // Cache resources for offline use
+            const cacheResources = async () => {
+                if ('caches' in window) {
+                    const cache = await caches.open('referral-coupon-cache-v1');
+                    await cache.addAll([
+                        '/',
+                        'index.html',
+                        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+                        'https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js'
+                    ]);
+                    console.log('Resources cached for offline use');
+                }
+            };
+            
+            // Call cache function on load
+            window.addEventListener('load', cacheResources);
+        }
+    </script>
+</body>
+</html>
